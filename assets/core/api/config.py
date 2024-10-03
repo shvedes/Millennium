@@ -3,7 +3,7 @@ import Millennium, json, os # type: ignore
 from api.css_analyzer import ColorTypes, convert_from_hex, convert_to_hex, parse_root
 from api.themes import is_valid
 from api.watchdog import SteamUtils
-from util.webkit_handler import WebkitStack, add_browser_css
+from util.webkit_handler import WebkitStack, add_browser_css, add_browser_js
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -138,11 +138,14 @@ class Config:
         if "failed" in theme:
             return
 
-        if "Steam-WebKit" in theme["data"] and isinstance(theme["data"]["Steam-WebKit"], str):
-            add_browser_css(os.path.join(Millennium.steam_path(), "skins", name, theme["data"]["Steam-WebKit"]))
+        keys = ["Steam-WebKit", "webkitCSS", "RootColors"]
 
-        if "RootColors" in theme["data"] and isinstance(theme["data"]["RootColors"], str):
-            add_browser_css(os.path.join(Millennium.steam_path(), "skins", name, theme["data"]["RootColors"]))
+        for key in keys:
+            if key in theme["data"] and isinstance(theme["data"][key], str):
+                add_browser_css(os.path.join(Millennium.steam_path(), "skins", name, theme["data"][key]))
+
+        if "webkitJS" in theme["data"] and isinstance(theme["data"]["webkitJS"], str):
+            add_browser_js(os.path.join(Millennium.steam_path(), "skins", name, theme["data"]["webkitJS"]))
 
 
     def setup_colors(self, file_path):
